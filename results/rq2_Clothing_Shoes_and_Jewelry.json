@@ -1,0 +1,75 @@
+{
+  "category": "Clothing_Shoes_and_Jewelry",
+  "reviews": 483948,
+  "k": 5,
+  "focus_topic": 2,
+  "per_topic": [
+    {
+      "topic": 2,
+      "reviews": 42755,
+      "misaligned_pct": 4.252134253303707,
+      "mean_gap": 0.4736288153432347,
+      "mean_words": 34.08927610805754,
+      "verified_pct": 80.50520406969946
+    },
+    {
+      "topic": 3,
+      "reviews": 315553,
+      "misaligned_pct": 8.180876112729083,
+      "mean_gap": 0.39026090704255706,
+      "mean_words": 60.55221468342877,
+      "verified_pct": 74.4746524355655
+    },
+    {
+      "topic": 4,
+      "reviews": 44824,
+      "misaligned_pct": 2.5075852222023918,
+      "mean_gap": 0.30481438515081205,
+      "mean_words": 31.13077815456006,
+      "verified_pct": 87.72309477065858
+    },
+    {
+      "topic": 0,
+      "reviews": 51725,
+      "misaligned_pct": 2.2754954084098595,
+      "mean_gap": 0.25426776220396324,
+      "mean_words": 28.416607056549058,
+      "verified_pct": 86.69115514741421
+    },
+    {
+      "topic": 1,
+      "reviews": 29091,
+      "misaligned_pct": 1.3199958750128906,
+      "mean_gap": 0.16417448695472828,
+      "mean_words": 10.714104018424942,
+      "verified_pct": 95.91970025093671
+    }
+  ],
+  "breakdown": [
+    {
+      "length": "Long",
+      "verification": "Verified",
+      "reviews": 3921,
+      "misaligned_pct": 6.937005865850549
+    },
+    {
+      "length": "Long",
+      "verification": "Unverified",
+      "reviews": 5353,
+      "misaligned_pct": 5.660377358490567
+    },
+    {
+      "length": "Short",
+      "verification": "Verified",
+      "reviews": 30499,
+      "misaligned_pct": 3.8525853306665794
+    },
+    {
+      "length": "Short",
+      "verification": "Unverified",
+      "reviews": 2982,
+      "misaligned_pct": 2.2803487592219986
+    }
+  ],
+  "highest_group": "Long + Verified"
+}

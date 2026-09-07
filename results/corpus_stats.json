@@ -1,0 +1,69 @@
+{
+  "reviews": 1494121,
+  "misaligned": 107848,
+  "misaligned_pct": 7.2182,
+  "mean_gap": 0.3216,
+  "threshold": 2,
+  "gap_histogram": {
+    "-4": 336,
+    "-3": 3308,
+    "-2": 24580,
+    "-1": 140552,
+    "0": 734560,
+    "1": 511161,
+    "2": 69734,
+    "3": 8727,
+    "4": 1163
+  },
+  "rating_histogram": {
+    "1": 139227,
+    "2": 76039,
+    "3": 117337,
+    "4": 213341,
+    "5": 948177
+  },
+  "predicted_histogram": {
+    "1": 54555,
+    "2": 165437,
+    "3": 210671,
+    "4": 577649,
+    "5": 485809
+  },
+  "groups": {
+    "A_rating_above_text": 590785,
+    "C_aligned": 734560,
+    "B_rating_below_text": 168776
+  },
+  "verified": {
+    "verified": {
+      "reviews": 1286994,
+      "misaligned": 92553,
+      "misaligned_pct": 7.1914
+    },
+    "unverified": {
+      "reviews": 207127,
+      "misaligned": 15295,
+      "misaligned_pct": 7.3844
+    }
+  },
+  "per_category": {
+    "Electronics": {
+      "reviews": 500000,
+      "misaligned": 35786,
+      "misaligned_pct": 7.1572,
+      "mean_gap": 0.3318
+    },
+    "Clothing_Shoes_and_Jewelry": {
+      "reviews": 500000,
+      "misaligned": 31119,
+      "misaligned_pct": 6.2238,
+      "mean_gap": 0.3594
+    },
+    "Health_and_Personal_Care": {
+      "reviews": 494121,
+      "misaligned": 40943,
+      "misaligned_pct": 8.286,
+      "mean_gap": 0.273
+    }
+  }
+}

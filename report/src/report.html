@@ -1,0 +1,764 @@
+<meta charset="utf-8">
+<title>Sentiment–Rating Misalignment in Amazon Reviews</title>
+<style>
+  @page { size: letter; margin: 19mm 16mm 20mm 16mm; }
+
+  html { font-size: 9.4pt; }
+  body {
+    font-family: "Times New Roman", Times, serif;
+    line-height: 1.30;
+    color: #000;
+    background: #fff;
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+  }
+
+  .title-block { column-span: all; text-align: center; margin-bottom: 10pt; }
+  h1 {
+    font-size: 18pt;
+    font-weight: normal;
+    line-height: 1.2;
+    margin: 0 0 9pt;
+    text-align: center;
+  }
+  .authors { font-size: 10pt; margin-bottom: 2pt; }
+  .affil { font-size: 8.6pt; font-style: italic; color: #222; }
+
+  .abstract-block {
+    column-span: all;
+    font-size: 8.8pt;
+    font-weight: bold;
+    margin: 10pt 0 4pt;
+    text-align: justify;
+  }
+  .abstract-block p { margin: 0 0 5pt; }
+  .abstract-block .lead { font-style: italic; }
+  .rule { column-span: all; border-top: 0.5pt solid #000; width: 34%; margin: 8pt auto 10pt; }
+
+  .body-cols { column-count: 2; column-gap: 6.5mm; }
+
+  h2 {
+    font-size: 9.6pt;
+    font-variant: small-caps;
+    font-weight: bold;
+    margin: 11pt 0 4pt;
+    text-align: left;
+    break-after: avoid;
+  }
+  h3 {
+    font-size: 9.4pt;
+    font-style: italic;
+    font-weight: normal;
+    margin: 8pt 0 3pt;
+    text-align: left;
+    break-after: avoid;
+  }
+  h2:first-child { margin-top: 0; }
+
+  p { margin: 0 0 5pt; text-indent: 11pt; }
+  p.noindent, h2 + p, h3 + p { text-indent: 0; }
+
+  ul, ol { margin: 0 0 5pt; padding-left: 13pt; }
+  li { margin-bottom: 2.5pt; text-align: justify; }
+
+  code, .m { font-family: "Courier New", Courier, monospace; font-size: 8.5pt; }
+
+  .eq {
+    text-align: center;
+    margin: 6pt 0;
+    font-style: italic;
+    break-inside: avoid;
+  }
+
+  figure {
+    margin: 7pt 0;
+    break-inside: avoid;
+    text-align: center;
+  }
+  figure img { width: 100%; height: auto; border: 0.4pt solid #999; }
+  figcaption {
+    font-size: 8pt;
+    text-align: left;
+    margin-top: 3pt;
+    text-indent: 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 8.1pt;
+    margin: 3pt 0 0;
+  }
+  th, td { padding: 1.6pt 3pt; text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  thead th { border-bottom: 0.5pt solid #000; font-weight: bold; }
+  table.ruled { border-top: 0.9pt solid #000; }
+  table.ruled tbody tr:last-child td { border-bottom: 0.9pt solid #000; }
+  td.num, th.num { font-variant-numeric: tabular-nums; }
+  tr.total td { border-top: 0.4pt solid #000; font-weight: bold; }
+
+  .tbl {
+    break-inside: avoid;
+    margin: 8pt 0;
+  }
+  .tbl .cap {
+    font-size: 8pt;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    margin-bottom: 1pt;
+  }
+  .tbl .title {
+    font-size: 8.2pt;
+    text-align: center;
+    font-style: italic;
+    margin-bottom: 3pt;
+  }
+
+  .refs { font-size: 8.2pt; }
+  .refs ol { padding-left: 15pt; }
+  .refs li { margin-bottom: 3pt; }
+
+  .footnote {
+    column-span: all;
+    border-top: 0.4pt solid #000;
+    padding-top: 3pt;
+    margin-top: 8pt;
+    font-size: 7.8pt;
+    text-indent: 0;
+  }
+</style>
+
+<div class="title-block">
+  <h1>Sentiment–Rating Misalignment and Product<br>Reputation Dynamics in Amazon Reviews</h1>
+  <div class="authors">Buyun Wang, Mingyang Xie, Siyuan Qiu, Lixing Yang</div>
+  <div class="affil">School of Computing, Queen's University, Kingston, Ontario, Canada</div>
+</div>
+
+<div class="abstract-block">
+  <p class="lead">Abstract—E-commerce platforms present a star rating and a written
+  review as two expressions of one opinion, and recommendation engines, seller
+  rankings and trust signals are built on that assumption. We test it on
+  1,494,121 Amazon reviews drawn from three product categories, scoring every
+  review body with a multilingual BERT sentiment classifier and comparing its
+  1–5 reading against the rating the reviewer actually assigned. The two signals
+  disagree for 50.84% of reviews and diverge by two stars or more for 7.22%.
+  The disagreement is strongly asymmetric: reviewers rate above the sentiment of
+  their own text 3.5 times as often as below it, a bias that holds across all
+  three categories. We then ask what predicts the gap. Clustering review bodies
+  with TF-IDF and K-Means shows misalignment rising monotonically with review
+  length, from 1.32% in the shortest cluster to 8.18% in the longest.
+  Verified-purchase status, by contrast, accounts for 0.19 percentage points
+  corpus-wide and is not a usable predictor. Finally we aggregate reviews to
+  product level, define a bounded reputation risk index over complaint share and
+  sentiment direction, and model it alongside a sales proxy with random forests
+  over 38,272 products. A product's mean star rating proves near-uninformative
+  about the sentiment its reviews carry, contributing 0.018 of feature
+  importance against 0.922 for mean sentiment. The results argue that star
+  ratings compress information the review text retains, and that length is
+  where the residual signal lives.</p>
+
+  <p>Index Terms—Sentiment analysis, rating prediction, text–rating discrepancy
+  detection, product reputation modelling, user behaviour analysis, e-commerce,
+  natural language processing.</p>
+</div>
+
+<div class="rule"></div>
+
+<div class="body-cols">
+
+<h2>1. Introduction</h2>
+
+<p class="noindent">Online reviews are the primary evidence a shopper has about
+a product they cannot handle. Platforms such as Amazon collect that evidence in
+two forms at once: a star rating, which is quantitative and trivially
+aggregable, and a written review, which is qualitative and rich. Nearly every
+downstream system — ranking, recommendation, seller reputation, fraud screening
+— consumes the first and discards the second, on the implicit assumption that
+the rating summarises the text.</p>
+
+<p>That assumption is testable, and it fails often enough to matter. Reviewers
+describe a late delivery, a poor fit, or a part that broke in a month, and then
+award four or five stars. The written complaint is real; the rating does not
+record it. Where this happens systematically, aggregate ratings overstate
+satisfaction, and any model trained on ratings inherits the distortion.</p>
+
+<p>We study this gap directly. Each review in our corpus carries two readings on
+the same 1–5 scale — the reviewer's own rating, and a sentiment classifier's
+reading of the review body — and their difference is the unit of analysis
+throughout:</p>
+
+<div class="eq">rating_gap = rating − predict_stars</div>
+
+<p>A positive gap means the stars are more generous than the text; a negative
+gap means the reverse. We group reviews accordingly into <b>Group A</b> (stars
+above text), <b>Group B</b> (stars below text) and <b>Group C</b> (aligned).</p>
+
+<p>Three research questions organise the work:</p>
+
+<ul>
+  <li><b>RQ1.</b> How far apart are the emotional intensity of a review's text
+  and its assigned rating, and in which direction?</li>
+  <li><b>RQ2.</b> Which review characteristics predict the mismatch?</li>
+  <li><b>RQ3.</b> Do misaligned reviews move a product's reputation and sales?</li>
+</ul>
+
+<p>Our contributions are as follows.</p>
+
+<ol>
+  <li><b>A corpus-scale measurement of the gap.</b> Across 1.49M reviews the two
+  signals disagree half the time and diverge severely for 7.22%, with a mean gap
+  of +0.32 stars.</li>
+  <li><b>Identification of the asymmetry as the dominant effect.</b> Group A
+  outnumbers Group B by 3.5 to 1. The direction of the bias is consistent across
+  categories, which argues for a behavioural rather than a categorical
+  explanation.</li>
+  <li><b>Review length as the predictor that survives.</b> Cluster-level
+  misalignment rises monotonically with mean review length, while
+  verified-purchase status — the intuitive candidate — separates the corpus by
+  only 0.19 percentage points.</li>
+  <li><b>A bounded product-level reputation risk index</b> defined over
+  complaint share, sentiment direction and log-scaled exposure, together with
+  random forest models relating it to observable review features.</li>
+</ol>
+
+<h2>2. Related Work</h2>
+
+<p class="noindent">Duan, Gu and Whinston [1] established with panel data that
+online reviews influence sales, and — importantly for our purposes — that review
+<i>volume</i> rather than review <i>valence</i> carried most of the measured
+effect. Their result motivates treating rating averages with suspicion as
+summaries of opinion, and informs our decision to log-scale volume rather than
+let it dominate a reputation score.</p>
+
+<p>Zhang et al. [4] examined which characteristics of a review matter for
+remanufactured product sales on Amazon, finding structural attributes such as
+length and helpfulness votes to be informative beyond the star value itself.
+This directly anticipates our RQ2 finding that length, not verification status,
+is where the residual signal lives.</p>
+
+<p>On the modelling side, Liu et al. [3] combine BERT with a BiGRU and softmax
+layer for e-commerce sentiment classification, and Zhou, Zhao and Wang [5]
+report a lighter-weight Python pipeline for merchandise comment sentiment. Both
+treat the review text as the ground truth and the rating as a label to be
+predicted. We invert that framing: we take neither as ground truth and study
+their disagreement as the object of interest.</p>
+
+<p>He et al. [2] detect fake-review buyers on Amazon from network structure,
+using purchase and reviewer graphs rather than text. Their work bounds the scope
+of ours. A rating–sentiment gap is not evidence of manipulation, and we make no
+such claim; the two lines of work address different phenomena and would need to
+be combined before either could speak to intent.</p>
+
+<h2>3. Dataset</h2>
+
+<p class="noindent">We use the Amazon Reviews 2023 corpus released by the McAuley
+Lab at UC San Diego, drawing three category files chosen to span distinct
+purchase types: a technical durable, an experiential fit-dependent good, and a
+consumable.</p>
+
+<div class="tbl">
+  <div class="cap">Table 1</div>
+  <div class="title">Corpus composition.</div>
+  <table class="ruled">
+    <thead>
+      <tr><th>Category</th><th class="num">Reviews</th><th class="num">Share</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Electronics</td><td class="num">500,000</td><td class="num">33.5%</td></tr>
+      <tr><td>Clothing, Shoes &amp; Jewelry</td><td class="num">500,000</td><td class="num">33.5%</td></tr>
+      <tr><td>Health &amp; Personal Care</td><td class="num">494,121</td><td class="num">33.1%</td></tr>
+      <tr class="total"><td>Total</td><td class="num">1,494,121</td><td class="num">100%</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p>Each record retains the star rating, review title and body, a
+verified-purchase flag, helpful-vote count, timestamp, product identifier
+(ASIN), variant-group identifier, and reviewer identifier. Records with an empty
+body after cleaning are dropped.</p>
+
+<h3>3.1 Sentiment scoring</h3>
+
+<p class="noindent">The <span class="m">predict_stars</span> column is not part
+of the released dataset; we generate it. Every review body is scored with
+<span class="m">nlptown/bert-base-multilingual-uncased-sentiment</span>, a
+transformer that emits a 1–5 star label on the same scale reviewers use, which
+is what makes the two signals directly subtractable. Bodies are split into
+sentences with NLTK, scored in batches on a CUDA GPU, and averaged to one value
+per review, so that a long review with mixed content is not dominated by its
+first clause. This is the only computationally expensive step in the project;
+everything downstream runs on a laptop.</p>
+
+<p>Two cleaning paths are used deliberately. Lexicon scoring with VADER (§5.3)
+receives text with punctuation, capitalisation and emoji intact, because VADER
+derives intensity from exactly those features. Bag-of-words models — TF-IDF, LDA
+and K-Means — receive lowercased, punctuation-stripped text, which is all they
+can consume. Abbreviation expansion is anchored to word boundaries so that
+frequent clothing terms are not corrupted by substring matches.</p>
+
+<h3>3.2 Interpreting predict_stars</h3>
+
+<p class="noindent">We treat <span class="m">predict_stars</span> as a model
+output rather than a label, and this qualification carries through the whole
+study. A general-purpose sentiment classifier applied to out-of-domain text is
+routinely a star away from a human judgement, so a threshold of
+<span class="m">|gap| ≥ 2</span> selects cases worth examining rather than
+proving that a reviewer was careless or dishonest. Where we report a
+misalignment rate we are reporting a disagreement between a reviewer and a
+model, and the split between reviewer behaviour and classifier error is not
+resolved by this data. Establishing it would require a hand-labelled sample; we
+identify this as the principal open item in §8.</p>
+
+<h2>4. Methodology</h2>
+
+<h3>4.1 RQ1 — measuring the gap</h3>
+
+<p class="noindent">For each review we compute
+<span class="m">rating_gap</span> and assign it to Group A, B or C by sign. We
+then characterise the two misaligned groups by content, applying Latent
+Dirichlet Allocation and BERTopic to their review bodies and extracting the
+highest-weighted TF-IDF terms per group. LDA supplies word–topic distributions;
+BERTopic supplies embedding-based clusters that are more sensitive to context.
+Together they answer what each direction of mismatch is actually <i>about</i>,
+as opposed to how large it is.</p>
+
+<h3>4.2 RQ2 — what predicts the gap</h3>
+
+<p class="noindent">Review bodies are vectorised with TF-IDF restricted to the
+1,000 most informative terms, with English stop words removed and terms
+appearing in more than 95% or fewer than 10 documents discarded. K-Means with
+k = 5 then partitions the corpus into semantic clusters, and each cluster is
+profiled for misalignment rate, mean gap, mean review length and
+verified-purchase share.</p>
+
+<p>Because K-Means numbers its clusters arbitrarily, the cluster of interest is
+selected by widest mean gap rather than by index, so the analysis is stable
+across refits. Within that cluster we cross review length — long at 50 words or
+more, short below — against verification status, producing four groups, and
+compare misalignment rates between them. The same verification comparison is
+then repeated over the entire corpus, which is the test the cluster-level
+result must survive.</p>
+
+<h3>4.3 RQ3 — reputation and sales</h3>
+
+<p class="noindent">Reviews are scored with VADER to obtain a continuous
+compound sentiment in [−1, 1], then aggregated by ASIN. Products with fewer than
+five reviews are excluded: a product with two reviews carries no reliable signal
+and should not enter a regression beside one with four hundred.</p>
+
+<p>We define reputation risk for a product as</p>
+
+<div class="eq">
+  Risk = [½·<i>n</i><sub>neg</sub>/<i>n</i> + ½·(1 − <span style="text-decoration:overline">s</span>)/2] · <i>w</i>
+</div>
+
+<p class="noindent">where <i>n</i><sub>neg</sub>/<i>n</i> is the share of
+reviews with negative compound sentiment,
+<span style="text-decoration:overline">s</span> is mean compound sentiment
+mapped from [−1, 1] onto [1, 0], and <i>w</i> is a log-scaled exposure term
+normalised by the busiest product in the corpus. The construction has three
+properties we require. Risk increases with complaint share. The
+<i>direction</i> of sentiment drives the score rather than its magnitude, so two
+products with identical complaint counts but opposite overall tone are
+separated. And volume breaks ties without overwhelming severity: five hundred
+angry reviews signal more damage than five, but a busy well-liked product still
+ranks below a quiet troubled one. Scores are bounded in [0, 1].</p>
+
+<p>Following [1], we use log review count as a sales proxy, since unit sales are
+not published. We fit random forest regressors (100 trees, 80:20 split) for both
+targets over mean rating, mean sentiment, review length, helpful votes,
+verified-purchase share and a time-decay weight. We report the correlation
+between the two targets alongside the models: both draw on review volume, and
+they are not independent outcomes.</p>
+
+<h2>5. Experiments and Results</h2>
+
+<h3>5.1 RQ1 — the gap is wide and asymmetric</h3>
+
+<p class="noindent">Ratings and text sentiment agree exactly for 49.16% of
+reviews. The remaining half disagree, and the disagreement does not balance.</p>
+
+<figure>
+  <img src="../../figures/rq1_rating_gap_distribution.png" alt="Distribution of rating gap">
+  <figcaption>Fig. 1. Distribution of <span class="m">rating_gap</span>
+  (Electronics). The mass to the right of zero substantially exceeds the mass to
+  the left: reviewers rate above the sentiment of their own text far more often
+  than below it.</figcaption>
+</figure>
+
+<div class="tbl">
+  <div class="cap">Table 2</div>
+  <div class="title">Rating gap distribution over the full corpus.</div>
+  <table class="ruled">
+    <thead>
+      <tr><th>Gap</th><th class="num">Reviews</th><th class="num">Share</th><th>Group</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="num">−4</td><td class="num">336</td><td class="num">0.02%</td><td>B</td></tr>
+      <tr><td class="num">−3</td><td class="num">3,308</td><td class="num">0.22%</td><td>B</td></tr>
+      <tr><td class="num">−2</td><td class="num">24,580</td><td class="num">1.65%</td><td>B</td></tr>
+      <tr><td class="num">−1</td><td class="num">140,552</td><td class="num">9.41%</td><td>B</td></tr>
+      <tr><td class="num">0</td><td class="num">734,560</td><td class="num">49.16%</td><td>C</td></tr>
+      <tr><td class="num">+1</td><td class="num">511,161</td><td class="num">34.21%</td><td>A</td></tr>
+      <tr><td class="num">+2</td><td class="num">69,734</td><td class="num">4.67%</td><td>A</td></tr>
+      <tr><td class="num">+3</td><td class="num">8,727</td><td class="num">0.58%</td><td>A</td></tr>
+      <tr><td class="num">+4</td><td class="num">1,163</td><td class="num">0.08%</td><td>A</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p>Group A holds 590,785 reviews (39.54%) against Group B's 168,776 (11.30%) — a
+ratio of 3.5 to 1. Restricted to reviews that disagree at all, 77.8% have the
+stars running ahead of the text. Mean <span class="m">rating_gap</span> across
+the corpus is +0.3216 stars.</p>
+
+<p>Severe misalignment, defined as a gap of two stars or more in either
+direction, affects 107,848 reviews or 7.22% of the corpus.</p>
+
+<p>The underlying distributions explain the asymmetry. Reviewers assign five
+stars to 63.5% of the products they review; the classifier reads only 32.5% of
+the corresponding texts as five-star sentiment, placing most of its mass at
+four. The rating scale is compressed at its top end in a way the text is not.</p>
+
+<figure>
+  <img src="../../figures/rq1_user_rating_distribution.png" alt="User rating distribution">
+  <figcaption>Fig. 2. Distribution of user-assigned star ratings (Electronics).
+  Heavily concentrated at five stars.</figcaption>
+</figure>
+
+<figure>
+  <img src="../../figures/rq1_predicted_sentiment_distribution.png" alt="Predicted sentiment distribution">
+  <figcaption>Fig. 3. Distribution of BERT-predicted sentiment on the same
+  reviews. The mode sits at four stars, not five.</figcaption>
+</figure>
+
+<p>The effect is stable across categories, which argues against a
+category-specific explanation.</p>
+
+<div class="tbl">
+  <div class="cap">Table 3</div>
+  <div class="title">Misalignment by category.</div>
+  <table class="ruled">
+    <thead>
+      <tr><th>Category</th><th class="num">Reviews</th><th class="num">Severe</th><th class="num">Mean gap</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Electronics</td><td class="num">500,000</td><td class="num">7.16%</td><td class="num">+0.332</td></tr>
+      <tr><td>Clothing, Shoes &amp; Jewelry</td><td class="num">500,000</td><td class="num">6.22%</td><td class="num">+0.359</td></tr>
+      <tr><td>Health &amp; Personal Care</td><td class="num">494,121</td><td class="num">8.29%</td><td class="num">+0.273</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p>Keyword extraction over the two misaligned groups shows what each direction
+looks like in practice. Group A reviews foreground functional vocabulary —
+<i>works</i>, <i>easy</i>, <i>sound</i>, <i>quality</i> — describing a product
+that performs while the surrounding tone stays measured. Group B reviews cluster
+on situational terms — <i>time</i>, <i>bought</i>, <i>just</i> — suggesting
+dissatisfaction with circumstances of the purchase rather than the product
+itself.</p>
+
+<figure>
+  <img src="../../figures/rq1_tfidf_keywords_group_a.png" alt="Group A keywords">
+  <figcaption>Fig. 4. Top TF-IDF terms, Group A (rating above text sentiment).</figcaption>
+</figure>
+
+<figure>
+  <img src="../../figures/rq1_tfidf_keywords_group_b.png" alt="Group B keywords">
+  <figcaption>Fig. 5. Top TF-IDF terms, Group B (rating below text sentiment).</figcaption>
+</figure>
+
+<h3>5.2 RQ2 — length predicts, verification does not</h3>
+
+<p class="noindent">Clustering the Clothing, Shoes and Jewelry category
+(483,948 reviews after filtering, k = 5) produces five groups whose misalignment
+rates differ by a factor of six. Ordering them by mean review length orders them
+by misalignment rate as well, without exception.</p>
+
+<div class="tbl">
+  <div class="cap">Table 4</div>
+  <div class="title">Cluster profiles, ordered by mean review length.</div>
+  <table class="ruled">
+    <thead>
+      <tr><th>Cluster</th><th class="num">n</th><th class="num">Words</th><th class="num">Misaligned</th><th class="num">Verified</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td class="num">29,091</td><td class="num">10.7</td><td class="num">1.32%</td><td class="num">95.9%</td></tr>
+      <tr><td>0</td><td class="num">51,725</td><td class="num">28.4</td><td class="num">2.28%</td><td class="num">86.7%</td></tr>
+      <tr><td>4</td><td class="num">44,824</td><td class="num">31.1</td><td class="num">2.51%</td><td class="num">87.7%</td></tr>
+      <tr><td>2</td><td class="num">42,755</td><td class="num">34.1</td><td class="num">4.25%</td><td class="num">80.5%</td></tr>
+      <tr><td>3</td><td class="num">315,553</td><td class="num">60.6</td><td class="num">8.18%</td><td class="num">74.5%</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p>The shortest cluster is dominated by terse endorsements — <i>stars</i>,
+<i>great</i>, <i>love</i> — averaging under eleven words, and misaligns 1.32% of
+the time. The longest averages sixty words on fit and sizing and misaligns
+8.18% of the time. A reviewer who writes at length has room to voice
+reservations that a single click cannot express; a reviewer who writes ten words
+has already committed to a verdict.</p>
+
+<p>Within the widest-gap cluster, crossing length against verification status
+puts long reviews ahead of short ones in both verification states.</p>
+
+<div class="tbl">
+  <div class="cap">Table 5</div>
+  <div class="title">Misalignment by length and verification, widest-gap cluster.</div>
+  <table class="ruled">
+    <thead>
+      <tr><th>Group</th><th class="num">Misaligned</th><th class="num">n</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Long + Verified</td><td class="num">6.94%</td><td class="num">3,921</td></tr>
+      <tr><td>Long + Unverified</td><td class="num">5.66%</td><td class="num">5,353</td></tr>
+      <tr><td>Short + Verified</td><td class="num">3.85%</td><td class="num">30,499</td></tr>
+      <tr><td>Short + Unverified</td><td class="num">2.28%</td><td class="num">2,982</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p>Length roughly doubles the rate within each verification state. Verification
+moves it by about a point, and — contrary to the intuition that unverified
+purchases drive rating inflation — moves it in the direction of <i>verified</i>
+reviews misaligning more.</p>
+
+<p>That cluster-level ordering does not by itself license a claim about
+verification, since a cluster's aggregate verification share says nothing about
+which reviews inside it are misaligned. We therefore repeat the comparison over
+the full corpus, where the effect all but vanishes.</p>
+
+<div class="tbl">
+  <div class="cap">Table 6</div>
+  <div class="title">Severe misalignment by verification, full corpus.</div>
+  <table class="ruled">
+    <thead>
+      <tr><th></th><th class="num">Misaligned</th><th class="num">n</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Verified purchase</td><td class="num">7.19%</td><td class="num">1,286,994</td></tr>
+      <tr><td>Unverified</td><td class="num">7.38%</td><td class="num">207,127</td></tr>
+      <tr class="total"><td>Difference</td><td class="num">0.19pp</td><td class="num">—</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p>Across 1.49M reviews, verification separates the corpus by 0.19 percentage
+points. It is not a usable predictor of misalignment, and the apparent
+cluster-level signal is a consequence of verification correlating with length
+rather than an effect in its own right.</p>
+
+<figure>
+  <img src="../../figures/rq2_topic1_rating_gap_by_group.png" alt="Rating gap by group">
+  <figcaption>Fig. 6. Rating gap distribution by length and verification within
+  the widest-gap cluster.</figcaption>
+</figure>
+
+<h3>5.3 RQ3 — reputation and sales</h3>
+
+<p class="noindent">Aggregating the full corpus to product level and applying the
+five-review floor yields 38,272 products. Random forests fit over the six
+product-level features give the results in Table 7.</p>
+
+<div class="tbl">
+  <div class="cap">Table 7</div>
+  <div class="title">Random forest performance, 80:20 split.</div>
+  <table class="ruled">
+    <thead>
+      <tr><th>Target</th><th class="num">R²</th><th class="num">RMSE</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Sales proxy (log review count)</td><td class="num">0.710</td><td class="num">0.397</td></tr>
+      <tr><td>Reputation risk</td><td class="num">0.924</td><td class="num">0.022</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p>The two models are driven by almost disjoint feature sets, which is the more
+interesting result.</p>
+
+<div class="tbl">
+  <div class="cap">Table 8</div>
+  <div class="title">Feature importance by target.</div>
+  <table class="ruled">
+    <thead>
+      <tr><th>Feature</th><th class="num">Sales</th><th class="num">Reputation</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Verified-purchase share</td><td class="num">0.572</td><td class="num">0.007</td></tr>
+      <tr><td>Helpful votes</td><td class="num">0.132</td><td class="num">0.011</td></tr>
+      <tr><td>Mean rating</td><td class="num">0.104</td><td class="num">0.018</td></tr>
+      <tr><td>Mean sentiment</td><td class="num">0.066</td><td class="num">0.922</td></tr>
+      <tr><td>Review length</td><td class="num">0.064</td><td class="num">0.026</td></tr>
+      <tr><td>Time weight</td><td class="num">0.063</td><td class="num">0.016</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<p>The reputation model's R² of 0.924 must be read with its construction in
+mind. Mean sentiment is an input to the risk index, and the forest recovers it
+with an importance of 0.922; the model is substantially rediscovering its own
+definition, and the figure measures internal consistency rather than predictive
+power. The result worth reporting is the negative space around it — mean rating
+contributes 0.018 and verified-purchase share 0.007. <i>A product's star average
+is close to uninformative about the sentiment its reviews actually carry.</i>
+This is RQ1's asymmetry reappearing at product level: ratings compress, text
+does not.</p>
+
+<p>The sales model carries no such circularity, and its leading feature is
+unexpected. Verified-purchase share alone accounts for 0.572 of the importance
+in predicting review volume — far ahead of helpful votes (0.132) and mean rating
+(0.104). Products whose reviews come predominantly from confirmed purchasers
+accumulate more reviews. Since review count is our sales proxy, the natural
+reading is that verification share tracks genuine transaction volume, which is
+what the proxy is standing in for. Note the contrast with RQ2: verification
+carries real information about a <i>product</i> while carrying almost none about
+whether an individual <i>review</i> is misaligned.</p>
+
+<p>The two targets correlate at only +0.159, so despite both drawing on review
+volume they behave largely independently, and the disjoint importance profiles
+in Table 8 are not an artefact of a shared target.</p>
+
+<p>Ranking products by risk gives face-valid results: the ten highest-risk
+products carry mean ratings between 1.0 and 2.25 stars with mean compound
+sentiment between −0.27 and −0.56, and they span review counts from five to 111,
+confirming that the exposure term breaks ties without letting popularity
+override severity.</p>
+
+<figure>
+  <img src="../../figures/rq3_rating_vs_reputation_risk.png" alt="Rating versus reputation risk">
+  <figcaption>Fig. 7. Product mean rating against reputation risk, coloured by
+  mean sentiment.</figcaption>
+</figure>
+
+<figure>
+  <img src="../../figures/rq3_rating_vs_sales_proxy.png" alt="Rating versus sales proxy">
+  <figcaption>Fig. 8. Product mean rating against the sales proxy.</figcaption>
+</figure>
+
+<h3>5.4 Threats to validity</h3>
+
+<p class="noindent"><b>The proxy is unvalidated.</b> Every misalignment figure
+in this paper measures disagreement between a reviewer and a classifier whose
+accuracy on this corpus we have not established. A two-star threshold sits near
+the error band of a general-purpose sentiment model, so some fraction of what we
+count as misalignment is model error. This does not affect the comparative
+results — length ordering, category stability, the verification null — because
+model error should not vary systematically with those factors, but it does mean
+absolute rates should be read as upper bounds.</p>
+
+<p><b>The reputation model is partly circular.</b> Mean sentiment is an input to
+the risk index, so its R² of 0.924 measures internal consistency, not
+predictive skill. We report it for the feature ranking it produces — chiefly
+that mean rating is near-uninformative — rather than as evidence the index can
+be forecast from independent signals.</p>
+
+<p><b>Sales are proxied, not observed.</b> Review count is a popularity signal
+standing in for unit sales, which Amazon does not publish. It also feeds the
+exposure term of the reputation index; the measured correlation between the two
+targets is +0.159, low enough that they behave largely independently, but they
+are not fully separate constructs.</p>
+
+<p><b>Cluster count is unjustified.</b> k = 5 follows prior practice in this
+setting rather than an elbow or silhouette analysis. The monotone length
+ordering in Table 4 is suggestive precisely because it does not depend on where
+the cluster boundaries fall, but the specific rates do.</p>
+
+<p><b>Coverage.</b> Three categories from one platform in one language. The
+consistency of the asymmetry across categories (Table 3) is evidence for
+generality but not proof of it.</p>
+
+<h2>6. Group Member Contributions</h2>
+
+<p class="noindent"><b>Buyun Wang</b> — related work, RQ1 methodology, RQ1
+experiments and results.</p>
+<p class="noindent"><b>Mingyang Xie</b> — introduction, part of the dataset
+section, data processing for RQ1 and RQ2.</p>
+<p class="noindent"><b>Lixing Yang</b> — project lead; RQ2 methodology,
+experiments and results; conclusions; part of the dataset section.</p>
+<p class="noindent"><b>Siyuan Qiu</b> — RQ3 methodology, experiments and
+results; part of the dataset section.</p>
+
+<h2>7. Replication Package</h2>
+
+<p class="noindent">Code, figures, pipeline output and this report are available
+at <span class="m">github.com/branbot6/amazon-review-sentiment-misalignment</span>.
+The repository ships the three analysis pipelines behind a single configurable
+data root, unit tests that run without the dataset, and the checked-in output
+of the corpus statistics run reported in §5.1. The corpus itself is not
+redistributed; the repository documents its source and the procedure for
+regenerating <span class="m">predict_stars</span>.</p>
+
+<h2>8. Conclusion and Future Work</h2>
+
+<p class="noindent">We set out to test whether a star rating faithfully
+summarises the review written beside it. Over 1,494,121 Amazon reviews it does
+so for roughly half, and where it fails it fails in a consistent direction:
+reviewers rate above the sentiment of their own text 3.5 times as often as below
+it, with a mean gap of +0.32 stars that holds across three unrelated product
+categories. The rating scale is compressed at its top end in a way the text is
+not, and aggregate ratings therefore overstate satisfaction by a measurable
+margin.</p>
+
+<p>Asking what predicts the gap produced a clearer answer than we expected, and
+not the one we anticipated. Review length orders cluster-level misalignment
+monotonically, from 1.32% among ten-word endorsements to 8.18% among sixty-word
+accounts of fit and sizing. Verified-purchase status — the intuitive candidate,
+and the one a platform can act on most easily — separates the corpus by 0.19
+percentage points and carries no usable signal. What appears at cluster level as
+a verification effect is length asserting itself through a correlated variable.
+The practical implication is that a platform looking for reviews whose text
+carries information the rating omits should read the long ones, irrespective of
+purchase verification.</p>
+
+<p>At product level, across 38,272 products, the same compression appears again.
+A product's mean star rating contributes 0.018 of feature importance in
+explaining the sentiment its reviews actually carry, against 0.922 for mean
+sentiment itself: the star average is close to uninformative about the tone of
+the text beneath it. Verified-purchase share, meanwhile, dominates the sales
+proxy at 0.572 while contributing 0.007 to reputation — informative about a
+product, uninformative about whether any given review is misaligned. The two
+findings are consistent, and both point the same way. Aggregate ratings are a
+lossy summary, and the loss is systematic rather than noisy.</p>
+
+<p>Four directions follow directly. <b>Validating the proxy</b> is the most
+important: a hand-labelled stratified sample of several hundred reviews would
+let the misalignment rate be decomposed into reviewer behaviour and classifier
+error, which this data cannot separate and which conditions every absolute
+number we report. <b>Modelling the gap directly</b> — as a regression target
+over review features rather than a threshold — would use the full distribution
+in Table 2 instead of discarding it at a cut point. <b>Longitudinal analysis</b>
+of sentiment trajectories per product would test whether misalignment
+accumulates or corrects as a product ages, which our cross-sectional design
+cannot address. And <b>extending across platforms and languages</b> would
+establish whether the positivity bias is a property of reviewers or of Amazon's
+particular interface, a question the consistency across our three categories
+raises but cannot settle.</p>
+
+</div>
+
+<div class="refs">
+  <h2 style="column-span: all;">References</h2>
+  <ol>
+    <li>W. Duan, B. Gu, and A. B. Whinston, "Do online reviews matter? An
+    empirical investigation of panel data," <i>Decision Support Systems</i>,
+    vol. 45, no. 4, pp. 1007–1016, 2008.</li>
+    <li>S. He, B. Hollenbeck, G. Overgoor, D. Proserpio, and A. Tosyali,
+    "Detecting fake-review buyers using network structure: Direct evidence from
+    Amazon," <i>Proceedings of the National Academy of Sciences</i>, vol. 119,
+    no. 48, e2211932119, 2022.</li>
+    <li>Y. Liu, J. Lu, J. Yang, and F. Mao, "Sentiment analysis for e-commerce
+    product reviews by deep learning model of BERT-BiGRU-Softmax,"
+    <i>Mathematical Biosciences and Engineering</i>, vol. 17, no. 6,
+    pp. 7819–7837, 2020.</li>
+    <li>Y. Zhang, L. Zhang, X. Li, and Y. Zhang, "The importance of online
+    customer review characteristics on remanufactured product sales: Evidence
+    from the mobile phone market on amazon.com," <i>Journal of Retailing and
+    Consumer Services</i>, vol. 77, 103677, 2024.</li>
+    <li>Y. Zhou, L. Zhao, and L. Wang, "Sentiment analysis of merchandises'
+    comments based on Python," <i>Computer Knowledge and Technology</i>,
+    vol. 16, no. 8, pp. 94–96, 2020.</li>
+  </ol>
+</div>
